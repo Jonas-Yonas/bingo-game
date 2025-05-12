@@ -2,17 +2,15 @@
 
 import { useSession } from "next-auth/react";
 import { useCashier, useUpdateCashier } from "@/hooks/useCashiers";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { CashierForm } from "@/app/components/cashier/CashierForm";
 import { CashierFormValues } from "@/lib/validations/cashierSchema";
 
-export default function EditCashierPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function EditCashierPage() {
+  const { id } = useParams() as { id: string };
+
   const { data: session } = useSession();
-  const { data: cashier, isLoading } = useCashier(params.id);
+  const { data: cashier, isLoading } = useCashier(id);
   const { mutateAsync: updateCashier } = useUpdateCashier();
 
   if (!session || session.user.role !== "ADMIN") {
@@ -23,7 +21,7 @@ export default function EditCashierPage({
   if (!cashier) return notFound();
 
   const handleSubmit = async (data: CashierFormValues) => {
-    await updateCashier({ id: params.id, ...data });
+    await updateCashier({ id: id, ...data });
   };
 
   return (

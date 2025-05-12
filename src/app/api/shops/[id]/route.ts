@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { ShopFormSchema } from "@/lib/validations/shopSchema";
@@ -6,12 +6,14 @@ import { authOptions } from "@/lib/authOptions";
 
 /** Route to GET a shop */
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const shopId = params.id;
+
   try {
     const shop = await db.shop.findUnique({
-      where: { id: params.id },
+      where: { id: shopId },
       include: {
         manager: {
           select: {
@@ -71,9 +73,11 @@ export async function GET(
 
 /** Route to EDIT a shop */
 export async function PATCH(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const shopId = params.id;
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -84,7 +88,7 @@ export async function PATCH(
     const data = ShopFormSchema.parse(body);
 
     const updatedShop = await db.shop.update({
-      where: { id: params.id },
+      where: { id: shopId },
       data: {
         name: data.name.trim(),
         location: data.location.trim(),
@@ -107,9 +111,11 @@ export async function PATCH(
 
 /** Route to DELETE a shop */
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const shopId = params.id;
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -118,7 +124,7 @@ export async function DELETE(
   try {
     // Check if shop exists and has cashiers
     const shop = await db.shop.findUnique({
-      where: { id: params.id },
+      where: { id: shopId },
       include: { cashiers: true },
     });
 
@@ -134,7 +140,7 @@ export async function DELETE(
     }
 
     await db.shop.delete({
-      where: { id: params.id },
+      where: { id: shopId },
     });
 
     return NextResponse.json({ success: true });
