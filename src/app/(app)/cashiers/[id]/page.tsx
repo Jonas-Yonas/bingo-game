@@ -2,18 +2,13 @@
 
 import { useSession } from "next-auth/react";
 import { useCashier, useUpdateCashier } from "@/hooks/useCashiers";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { CashierForm } from "@/app/components/cashier/CashierForm";
 import { CashierFormValues } from "@/lib/validations/cashierSchema";
 
-interface PageProps {
-  params: {
-    id: string;
-  };
-}
+export default function EditCashierPage() {
+  const { id } = useParams() as { id: string };
 
-export default function EditCashierPage({ params }: PageProps) {
-  const { id } = params;
   const { data: session } = useSession();
   const { data: cashier, isLoading } = useCashier(id);
   const { mutateAsync: updateCashier } = useUpdateCashier();
