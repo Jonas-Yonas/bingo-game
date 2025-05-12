@@ -3,7 +3,9 @@ import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./providers/theme-provider";
 import AuthProvider from "./providers/AuthProvider";
-import { Toaster } from "sonner";
+// import { Toaster } from "sonner";
+import ReactQueryProvider from "./providers/ReactQueryProvider";
+import { Toaster } from "./components/toaster";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -46,8 +48,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            {children}
-            <Toaster position="top-right" richColors />
+            <ReactQueryProvider>
+              {children}
+              {/* <Toaster position="top-right" richColors /> */}
+              <Toaster />
+            </ReactQueryProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

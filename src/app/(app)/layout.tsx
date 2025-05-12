@@ -5,7 +5,7 @@ import { Sidebar } from "../components/layout/Sidebar";
 import { Topbar } from "../components/layout/Topbar";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
     <div className="flex min-h-screen w-full">

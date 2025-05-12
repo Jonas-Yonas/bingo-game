@@ -27,7 +27,7 @@ export default function LoginPage() {
   if (status === "loading") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-950 flex flex-col items-center justify-center">
-        <Spinner size="lg" />
+        <Spinner />
         <div className="text-white">Loading...</div>
       </div>
     );
