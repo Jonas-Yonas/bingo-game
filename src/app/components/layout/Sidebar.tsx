@@ -18,8 +18,16 @@ const SIDEBAR_ITEMS = [
     icon: <LayoutDashboard className="size-5" />,
     href: "/dashboard",
   },
-  { name: "Cashiers", icon: <Users className="size-5" />, href: "/cashiers" },
-  { name: "Shops", icon: <ShoppingCart className="size-5" />, href: "/shops" },
+  {
+    name: "Cashiers",
+    icon: <Users className="size-5" />,
+    href: "/cashiers/cashier-list",
+  },
+  {
+    name: "Shops",
+    icon: <ShoppingCart className="size-5" />,
+    href: "/shops/shop-list",
+  },
   {
     name: "Wallet History",
     icon: <Wallet className="size-5" />,
@@ -37,11 +45,11 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "fixed h-screen z-10 bg-background border-r transition-all duration-300 ease-in-out",
+        "fixed h-screen z-10 bg-background border-r transition-all duration-300 ease-in-out w-full bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-10 border border-gray-700",
         isCollapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="flex h-16 items-center justify-between border-b px-4">
+      <div className="flex h-16 items-center justify-between border-b px-4 w-full bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-10 border border-gray-700">
         {!isCollapsed && (
           <h1 className="text-lg font-semibold truncate">Bingo Admin</h1>
         )}

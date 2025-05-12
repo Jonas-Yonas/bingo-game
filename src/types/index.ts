@@ -1,13 +1,19 @@
-export type Shop = {
+import { User } from "@prisma/client";
+
+export interface Shop {
   id: string;
   name: string;
   location: string;
-  cashierName: string;
   shopCommission: number;
   systemCommission: number;
   walletBalance: number;
-  shopId: number;
-};
+  cashiers?: Cashier[]; // Optional if not always included
+  manager?: User | null; // Optional if not always included
+  managerId?: string | null;
+  cashierName?: string; // Add this if you're using it in your columns
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
 export type Cashier = {
   id: string;

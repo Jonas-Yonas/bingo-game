@@ -1,54 +1,4 @@
 
-// generator client {
-//   provider = "prisma-client-js"
-//   output   = "../node_modules/.prisma/client"
-// }
-
-// datasource db {
-//   provider = "mongodb"
-//   url      = env("DATABASE_URL")
-// }
-
-// model User {
-//   id            String    @id @default(auto()) @map("_id") @db.ObjectId
-//   name          String?
-//   email         String    @unique
-//   emailVerified DateTime?
-//   password      String?
-//   image         String?
-//   role          String    @default("USER")
-//   accounts      Account[]
-//   sessions      Session[]
-//   createdAt     DateTime  @default(now())
-//   updatedAt     DateTime  @updatedAt
-// }
-
-// model Account {
-//   id                String  @id @default(auto()) @map("_id") @db.ObjectId
-//   userId            String  @db.ObjectId
-//   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-//   type              String
-//   provider          String
-//   providerAccountId String
-//   refresh_token     String? @db.String
-//   access_token      String? @db.String
-//   expires_at        Int?
-//   token_type        String?
-//   scope             String?
-//   id_token          String? @db.String
-//   session_state     String?
-
-//   @@unique([provider, providerAccountId])
-// }
-
-// model Session {
-//   id           String   @id @default(auto()) @map("_id") @db.ObjectId
-//   sessionToken String   @unique
-//   userId       String   @db.ObjectId
-//   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-//   expires      DateTime
-// }
-
 generator client {
   provider = "prisma-client-js"
   output   = "../node_modules/.prisma/client"
@@ -69,7 +19,7 @@ model User {
   role          String    @default("USER")
   accounts      Account[]
   sessions      Session[]
-  managedShop   Shop?     @relation("ShopOwner")  // A user can manage one shop
+  managedShop   Shop[]     @relation("ShopOwner")  // A user can manage one shop
   cashierProfile Cashier?  @relation("CashierProfile") // A user can have one cashier profile
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -110,7 +60,7 @@ model Cashier {
   status    String   @default("AVAILABLE")
   user      User?    @relation("CashierProfile", fields: [userId], references: [id])
   userId    String?  @db.ObjectId @unique
-  shop      Shop     @relation(fields: [shopId], references: [id])
+  shop      Shop?    @relation("ShopToCashier", fields: [shopId], references: [id], onDelete: Cascade)
   shopId    String   @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -123,9 +73,9 @@ model Shop {
   shopCommission  Float     @default(0.0)
   systemCommission Float     @default(0.0)
   walletBalance   Float     @default(0.0)
-  cashiers        Cashier[]
+  cashiers        Cashier[] @relation("ShopToCashier")
   manager         User?     @relation("ShopOwner", fields: [managerId], references: [id])
-  managerId       String?   @db.ObjectId @unique
+  managerId       String?   @db.ObjectId
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 }
