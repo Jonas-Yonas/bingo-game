@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { ShopFormSchema } from "@/lib/validations/shopSchema";
@@ -6,7 +6,7 @@ import { authOptions } from "@/lib/authOptions";
 
 /** Route to GET a shop */
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const shopId = params.id;
@@ -73,7 +73,7 @@ export async function GET(
 
 /** Route to EDIT a shop */
 export async function PATCH(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const shopId = params.id;
@@ -111,7 +111,7 @@ export async function PATCH(
 
 /** Route to DELETE a shop */
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const shopId = params.id;
