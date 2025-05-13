@@ -3,13 +3,11 @@ import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { ShopFormSchema } from "@/lib/validations/shopSchema";
 import { authOptions } from "@/lib/authOptions";
+import { useParams } from "next/navigation";
 
 /** Route to GET a shop */
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const shopId = params.id;
+export async function GET() {
+  const { id: shopId } = useParams() as { id: string };
 
   try {
     const shop = await db.shop.findUnique({
@@ -72,11 +70,8 @@ export async function GET(
 }
 
 /** Route to EDIT a shop */
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const shopId = params.id;
+export async function PATCH(req: NextRequest) {
+  const { id: shopId } = useParams() as { id: string };
 
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
@@ -110,11 +105,8 @@ export async function PATCH(
 }
 
 /** Route to DELETE a shop */
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const shopId = params.id;
+export async function DELETE() {
+  const { id: shopId } = useParams() as { id: string };
 
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
