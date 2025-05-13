@@ -4,10 +4,10 @@ import { getServerSession } from "next-auth";
 import { ShopFormSchema } from "@/lib/validations/shopSchema";
 import { authOptions } from "@/lib/authOptions";
 
-/** Route to GET a shop */
+/** Correct GET route handler */
 export async function GET(
-  request: NextRequest, // First parameter must be request
-  { params }: { params: { id: string } } // Second parameter contains params
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
   const { id: shopId } = params;
 
@@ -51,7 +51,6 @@ export async function GET(
       return NextResponse.json({ error: "Shop not found" }, { status: 404 });
     }
 
-    // Transform cashiers data for better UI consumption
     const transformedShop = {
       ...shop,
       cashiers: shop.cashiers.map((cashier) => ({
@@ -73,7 +72,7 @@ export async function GET(
 
 /** Route to EDIT a shop */
 export async function PATCH(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const { id: shopId } = params;
@@ -84,7 +83,7 @@ export async function PATCH(
   }
 
   try {
-    const body = await req.json();
+    const body = await request.json();
     const data = ShopFormSchema.parse(body);
 
     const updatedShop = await db.shop.update({
@@ -110,7 +109,7 @@ export async function PATCH(
 
 /** Route to DELETE a shop */
 export async function DELETE(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const { id: shopId } = params;
