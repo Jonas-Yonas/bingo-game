@@ -5,8 +5,11 @@ import { ShopFormSchema } from "@/lib/validations/shopSchema";
 import { authOptions } from "@/lib/authOptions";
 
 /** Route to GET a shop */
-export async function GET(context: { params: { id: string } }) {
-  const { id: shopId } = context.params;
+export async function GET(
+  request: NextRequest, // First parameter must be request
+  { params }: { params: { id: string } } // Second parameter contains params
+) {
+  const { id: shopId } = params;
 
   try {
     const shop = await db.shop.findUnique({
@@ -71,9 +74,9 @@ export async function GET(context: { params: { id: string } }) {
 /** Route to EDIT a shop */
 export async function PATCH(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
-  const { id: shopId } = context.params;
+  const { id: shopId } = params;
 
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
@@ -92,7 +95,6 @@ export async function PATCH(
         shopCommission: Number(data.shopCommission),
         systemCommission: Number(data.systemCommission),
         walletBalance: Number(data.walletBalance),
-        // Don't update managerId here to prevent accidental changes
       },
     });
 
@@ -109,9 +111,9 @@ export async function PATCH(
 /** Route to DELETE a shop */
 export async function DELETE(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
-  const { id: shopId } = context.params;
+  const { id: shopId } = params;
 
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
