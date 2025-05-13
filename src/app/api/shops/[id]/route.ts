@@ -7,9 +7,9 @@ import { authOptions } from "@/lib/authOptions";
 /** Correct GET route handler */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
-  const { id: shopId } = params;
+  const { id: shopId } = context.params;
 
   try {
     const shop = await db.shop.findUnique({
