@@ -39,7 +39,10 @@ export function Topbar() {
               <span className="sr-only">User menu</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent
+            align="end"
+            className="w-56 bg-white/15 backdrop-blur-md shadow-lg rounded-lg"
+          >
             <DropdownMenuLabel>
               {status === "authenticated" ? (
                 <div className="flex flex-col">
@@ -55,11 +58,12 @@ export function Topbar() {
               )}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem className="hover:outline-none hover:cursor-pointer">
               <Settings className="mr-2 size-4" />
               <span>Settings</span>
             </DropdownMenuItem>
             <DropdownMenuItem
+              className="hover:outline-none hover:cursor-pointer"
               onClick={() =>
                 signOut({
                   callbackUrl: "/login",

@@ -5,11 +5,7 @@ import { ShopFormSchema } from "@/lib/validations/shopSchema";
 import { authOptions } from "@/lib/authOptions";
 
 /** Route to GET a shop */
-export async function GET(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
-  const session = await getServerSession(authOptions);
+export async function GET(context: { params: { id: string } }) {
   const { id: shopId } = context.params;
 
   try {
