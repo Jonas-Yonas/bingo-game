@@ -1,11 +1,12 @@
-// lib/validations/cashierSchema.ts
 import { z } from "zod";
 
-export const CashierSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
+export const CashierFormSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
   phone: z.string().optional(),
-  shopId: z.string().min(1, "Shop is required"),
+  isActive: z.boolean(),
+  status: z.enum(["AVAILABLE", "ON_BREAK", "OFF_DUTY"]),
+  shopId: z.string().min(1),
 });
 
-export type CashierFormValues = z.infer<typeof CashierSchema>;
+export type CashierFormValues = z.infer<typeof CashierFormSchema>;

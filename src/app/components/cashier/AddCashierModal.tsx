@@ -1,4 +1,3 @@
-// app/admin/cashiers/_components/AddCashierModal.tsx
 "use client";
 
 import {
@@ -8,36 +7,50 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CashierForm } from "./CashierForm";
-import { useAddCashier } from "@/hooks/useCashiers";
-import { CashierFormValues } from "@/lib/validations/cashierSchema";
+import type { Cashier } from "@/types";
+import type { CashierFormValues } from "@/lib/validations/cashierSchema";
 
-export function AddCashierModal({
-  open,
-  onClose,
-}: {
+type CashierFormModalProps = {
   open: boolean;
   onClose: () => void;
-}) {
-  const { mutate: addCashier, isPending } = useAddCashier();
+  onSubmit: (data: CashierFormValues) => void;
+  cashier?: Cashier | null;
+};
 
-  const handleSubmit = async (data: CashierFormValues) => {
-    addCashier(data, {
-      onSuccess: () => onClose(),
-    });
-  };
+export function CashierFormModal({
+  open,
+  onClose,
+  onSubmit,
+  cashier,
+}: CashierFormModalProps) {
+  if (!open) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add New Cashier</DialogTitle>
-        </DialogHeader>
-        <CashierForm
-          onSubmit={handleSubmit}
-          onCancel={onClose}
-          isLoading={isPending}
-        />
-      </DialogContent>
-    </Dialog>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <Dialog open={open} onOpenChange={onClose}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-gray-800 dark:text-white">
+                {cashier ? "Edit " : "Add New"} Cashier
+              </DialogTitle>
+            </DialogHeader>
+            <CashierForm
+              mode={cashier ? "edit" : "add"}
+              defaultValues={
+                cashier
+                  ? {
+                      ...cashier,
+                      shopId: cashier.shop?.id || "",
+                    }
+                  : undefined
+              }
+              onSubmit={async (data) => onSubmit(data)}
+              onCancel={onClose}
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
   );
 }

@@ -15,15 +15,22 @@ export interface Shop {
   updatedAt?: Date;
 }
 
-export type Cashier = {
+export interface Cashier {
   id: string;
   name: string;
   email: string;
-  phone: string;
-  status: "AVAILABLE" | "ON_BREAK" | "OFF_DUTY";
-  createdAt: Date | string;
+  phone?: string;
   isActive?: boolean;
-};
+  status: "AVAILABLE" | "ON_BREAK" | "OFF_DUTY";
+  // shop?: {
+  //   id: string;
+  //   name: string;
+  //   location: string;
+  // };
+  shop?: Shop;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
 export type Transaction = {
   id: string;
