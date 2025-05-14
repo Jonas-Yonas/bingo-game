@@ -12,7 +12,7 @@ export default function DashboardPage() {
   if (status === "loading") {
     return (
       <div>
-        <Spinner size="lg" />
+        <Spinner />
         <p className="text-muted-foreground text-sm">
           Loading your experience...
         </p>
