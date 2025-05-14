@@ -10,19 +10,19 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  password      String?
-  image         String?
-  role          String    @default("USER")
-  accounts      Account[]
-  sessions      Session[]
-  managedShop   Shop[]     @relation("ShopOwner")  // A user can manage one shop
-  cashierProfile Cashier?  @relation("CashierProfile") // A user can have one cashier profile
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+  name           String?
+  email          String     @unique
+  emailVerified  DateTime?
+  password       String?
+  image          String?
+  role           String     @default("USER")
+  accounts       Account[]
+  sessions       Session[]
+  managedShop    Shop[]     @relation("ShopOwner")
+  cashierProfile Cashier?   @relation("CashierProfile")
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 }
 
 model Account {
@@ -60,22 +60,22 @@ model Cashier {
   status    String   @default("AVAILABLE")
   user      User?    @relation("CashierProfile", fields: [userId], references: [id])
   userId    String?  @db.ObjectId @unique
-  shop      Shop?    @relation("ShopToCashier", fields: [shopId], references: [id], onDelete: Cascade)
+  shop      Shop     @relation("ShopCashiers", fields: [shopId], references: [id], onDelete: Cascade)
   shopId    String   @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Shop {
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId
-  name            String
-  location        String
-  shopCommission  Float     @default(0.0)
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  location         String
+  shopCommission   Float     @default(0.0)
   systemCommission Float     @default(0.0)
-  walletBalance   Float     @default(0.0)
-  cashiers        Cashier[] @relation("ShopToCashier")
-  manager         User?     @relation("ShopOwner", fields: [managerId], references: [id])
-  managerId       String?   @db.ObjectId
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  walletBalance    Float     @default(0.0)
+  cashiers         Cashier[] @relation("ShopCashiers")
+  manager          User?     @relation("ShopOwner", fields: [managerId], references: [id])
+  managerId        String?   @db.ObjectId
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }

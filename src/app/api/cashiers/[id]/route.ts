@@ -99,46 +99,108 @@ export async function PATCH(
 }
 
 // DELETE /api/cashiers/[id]
-export async function DELETE(
-  request: Request,
-  context: { params: { id: string } }
-) {
-  const cashierId = context.params.id;
-  const session = await getServerSession(authOptions);
+// export async function DELETE(
+//   request: Request,
+//   context: { params: { id: string } }
+// ) {
+//   const cashierId = context.params.id;
+//   const session = await getServerSession(authOptions);
 
+//   if (!session?.user?.id) {
+//     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+//   }
+
+//   try {
+//     const cashier = await db.cashier.findUnique({
+//       where: { id: cashierId },
+//     });
+
+//     if (!cashier) {
+//       return NextResponse.json({ error: "Cashier not found" }, { status: 404 });
+//     }
+
+//     if (cashier.userId) {
+//       return NextResponse.json(
+//         {
+//           error: "Cannot delete cashier",
+//           message:
+//             "This cashier is linked to a user account. Unlink the user first.",
+//         },
+//         { status: 400 }
+//       );
+//     }
+
+//     await db.cashier.delete({
+//       where: { id: cashierId },
+//     });
+
+//     return NextResponse.json({ success: true });
+//   } catch (error) {
+//     console.error("Error deleting cashier:", error);
+//     return NextResponse.json(
+//       { error: "Failed to delete cashier" },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
+    // Check cashier exists and get relations
     const cashier = await db.cashier.findUnique({
-      where: { id: cashierId },
+      where: { id: params.id },
+      include: { user: true, shop: true },
     });
 
     if (!cashier) {
       return NextResponse.json({ error: "Cashier not found" }, { status: 404 });
     }
 
-    if (cashier.userId) {
+    // Authorization check
+    const isAdmin = session.user.role === "ADMIN";
+    const isOwner = cashier.userId === session.user.id;
+
+    if (!isAdmin && !isOwner) {
       return NextResponse.json(
-        {
-          error: "Cannot delete cashier",
-          message:
-            "This cashier is linked to a user account. Unlink the user first.",
-        },
-        { status: 400 }
+        { error: "Insufficient permissions" },
+        { status: 403 }
       );
     }
 
-    await db.cashier.delete({
-      where: { id: cashierId },
-    });
+    // MongoDB transaction for data integrity
+    await db.$transaction([
+      // Disconnect user relation if exists
+      ...(cashier.userId
+        ? [
+            db.user.update({
+              where: { id: cashier.userId },
+              data: { cashierProfile: { disconnect: true } },
+            }),
+          ]
+        : []),
+      // Delete the cashier
+      db.cashier.delete({ where: { id: params.id } }),
+    ]);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      message: "Cashier deleted successfully",
+    });
   } catch (error) {
-    console.error("Error deleting cashier:", error);
+    console.error("CASHIER_DELETION_ERROR:", error);
     return NextResponse.json(
-      { error: "Failed to delete cashier" },
+      {
+        error: "Failed to delete cashier",
+        ...(process.env.NODE_ENV === "development" && { details: error }),
+      },
       { status: 500 }
     );
   }

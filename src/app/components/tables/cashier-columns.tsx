@@ -130,7 +130,10 @@ export const cashierColumns: ColumnDef<Cashier>[] = [
           <TooltipTrigger asChild>
             <div className="max-w-[120px] truncate cursor-pointer">{id}</div>
           </TooltipTrigger>
-          <TooltipContent className="max-w-[300px] break-words">
+          <TooltipContent
+            className="bg-gray-200 text-gray-950 px-2 py-2 rounded-sm shadow-lg z-50"
+            style={{ maxWidth: "300px", wordWrap: "break-word" }}
+          >
             {id}
           </TooltipContent>
         </Tooltip>

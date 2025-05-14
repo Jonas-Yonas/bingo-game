@@ -18,7 +18,7 @@ import { ConfirmDeleteDialog } from "@/app/components/ConfirmDeleteDialog";
 import { ColumnDef } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
-import { Cashier, Shop } from "@/types";
+import { Cashier } from "@/types";
 import { cashierColumns } from "@/app/components/tables/cashier-columns";
 
 export default function CashiersPage() {
@@ -78,7 +78,7 @@ export default function CashiersPage() {
         title: "Success",
         description: "Cashier deleted successfully!",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to delete cashier!",
@@ -107,7 +107,7 @@ export default function CashiersPage() {
 
   const enhancedColumns: ColumnDef<Cashier>[] = [
     ...cashierColumns,
-    ...(userRole !== "CASHIER" && userRole !== "USER" ? [actionColumn] : []),
+    ...(userRole !== "USER" ? [actionColumn] : []),
   ];
 
   return (
