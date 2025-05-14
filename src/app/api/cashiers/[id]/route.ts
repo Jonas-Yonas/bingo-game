@@ -5,17 +5,13 @@ import { CashierFormSchema } from "@/lib/validations/cashierSchema";
 import { authOptions } from "@/lib/authOptions";
 
 // GET /api/cashiers/[id]
-// export async function GET(
-//   request: NextRequest,
-//   context: { params: { id: string } }
-// ) {
-export async function GET() {
-  // const cashierId = context.params.id;
-  const cashierId = "78787777878787";
-
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const cashier = await db.cashier.findUnique({
-      where: { id: cashierId },
+      where: { id: params.id },
       include: {
         shop: {
           select: {
@@ -40,13 +36,11 @@ export async function GET() {
       return NextResponse.json({ error: "Cashier not found" }, { status: 404 });
     }
 
-    const transformedCashier = {
+    return NextResponse.json({
       ...cashier,
       avatar: cashier.user?.image || null,
       userId: cashier.user?.id || null,
-    };
-
-    return NextResponse.json(transformedCashier);
+    });
   } catch (error) {
     console.error("[CASHIER_GET]", error);
     return NextResponse.json(
@@ -58,7 +52,7 @@ export async function GET() {
 
 // PATCH /api/cashiers/[id]
 export async function PATCH(
-  request: NextRequest,
+  request: Request,
   context: { params: { id: string } }
 ) {
   const cashierId = context.params.id;
@@ -104,7 +98,7 @@ export async function PATCH(
 
 // DELETE /api/cashiers/[id]
 export async function DELETE(
-  request: NextRequest,
+  request: Request,
   context: { params: { id: string } }
 ) {
   const cashierId = context.params.id;
