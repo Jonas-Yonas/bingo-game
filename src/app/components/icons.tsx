@@ -1,4 +1,6 @@
 import {
+  Activity,
+  Calendar,
   Wallet,
   MapPin,
   User,
@@ -7,11 +9,16 @@ import {
   Plus,
   Trash2,
   Edit,
+  Mail,
   MoreVertical,
   Monitor,
+  Phone,
+  Store,
 } from "lucide-react";
 
 export const Icons = {
+  activity: Activity,
+  calendar: Calendar,
   wallet: Wallet,
   mapPin: MapPin,
   user: User,
@@ -20,8 +27,11 @@ export const Icons = {
   plus: Plus,
   trash: Trash2,
   edit: Edit,
+  mail: Mail,
   moreVertical: MoreVertical,
   monitor: Monitor,
+  phone: Phone,
+  store: Store,
   spinner: ({ ...props }: React.SVGProps<SVGSVGElement>) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -1,113 +1,156 @@
-// "use client";
-
-// import { cashierColumns } from "@/app/components/tables/cashier-columns";
-// import { DataTable } from "@/components/ui/data-table";
-// import { dummyCashiers } from "@/lib/data";
-
-// const page = () => {
-//   return (
-//     <div className="p-8">
-//       <h1 className="text-2xl font-bold pb-6">Cashiers</h1>
-
-//       <DataTable data={dummyCashiers} columns={cashierColumns} />
-//     </div>
-//   );
-// };
-
-// export default page;
-
-// app/admin/cashiers/page.tsx
-
-// "use client";
-
-// import Link from "next/link";
-// import { PlusCircle, Loader2, Pencil, Trash2 } from "lucide-react";
-// import { DataTable } from "@/components/ui/data-table";
-// import { Button } from "@/components/ui/button";
-// import { useCashier } from "@/hooks/useCashiers";
-// import { cashierColumns } from "@/app/components/tables/cashier-columns";
-// // import { cashierColumns } from "./columns";
-// // import { useCashiers } from "@/hooks/useCashiers";
-
-// const CashiersPage = () => {
-//   const { data: cashiers, isLoading, error } = useCashier();
-
-//   if (isLoading) {
-//     return (
-//       <div className="p-8 flex justify-center">
-//         <Loader2 className="h-8 w-8 animate-spin" />
-//       </div>
-//     );
-//   }
-
-//   if (error) {
-//     return (
-//       <div className="p-8 text-red-500">
-//         Error loading cashiers: {error.message}
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="p-8 space-y-4">
-//       <div className="flex justify-between items-center">
-//         <h1 className="text-2xl font-bold">Cashiers</h1>
-//         <Button asChild>
-//           <Link href="/cashiers/add" className="flex items-center gap-2">
-//             <PlusCircle className="h-4 w-4" />
-//             Add Cashier
-//           </Link>
-//         </Button>
-//       </div>
-
-//       <DataTable
-//         data={cashiers || []}
-//         columns={cashierColumns}
-//         emptyMessage="No cashiers found."
-//       />
-//     </div>
-//   );
-// };
-
-// export default CashiersPage;
-
-// app/admin/cashiers/page.tsx
 "use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
-import { AddCashierModal } from "@/app/components/cashier/AddCashierModal";
-import { useCashier } from "@/hooks/useCashiers";
+import {
+  useAddCashier,
+  useDeleteCashier,
+  useCashiers,
+  useUpdateCashier,
+} from "@/hooks/useCashiers";
+import { useSession } from "next-auth/react";
+import { CashierFormModal } from "@/app/components/cashier/AddCashierModal";
+import { CashierFormValues } from "@/lib/validations/cashierSchema";
+import { TableActions } from "@/app/components/tables/TableActions";
+import { ConfirmDeleteDialog } from "@/app/components/ConfirmDeleteDialog";
+import { ColumnDef } from "@tanstack/react-table";
+import { useRouter } from "next/navigation";
+import { toast } from "@/components/ui/use-toast";
+import { Cashier, Shop } from "@/types";
 import { cashierColumns } from "@/app/components/tables/cashier-columns";
-// import { DataTable } from "./_components/DataTable";
-// import { AddCashierModal } from "./_components/AddCashierModal";
 
 export default function CashiersPage() {
-  const { data: cashiers, isLoading, error } = useCashier();
+  const router = useRouter();
+  const { data: session } = useSession();
+  const userRole = session?.user?.role || "USER";
 
-  const [isAddModalOpen, setAddModalOpen] = useState(false);
+  // Fetch cashiers based on user role
+  const { data: cashiers, isLoading: isCashiersLoading, error } = useCashiers();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentCashier, setCurrentCashier] = useState<Cashier | null>(null);
+  const [cashierToDelete, setCashierToDelete] = useState<Cashier | null>(null);
+
+  const { mutateAsync: addCashier } = useAddCashier();
+  const { mutateAsync: updateCashier } = useUpdateCashier();
+  const { mutateAsync: deleteCashier } = useDeleteCashier();
+
+  const handleSubmit = async (data: CashierFormValues) => {
+    try {
+      if (currentCashier) {
+        await updateCashier({ id: currentCashier.id, ...data });
+        toast({
+          title: "Success",
+          description: "Cashier updated successfully!",
+        });
+      } else {
+        await addCashier(data);
+        toast({
+          title: "Success",
+          description: "Cashier added successfully!",
+        });
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Operation failed!",
+      });
+      console.error("Operation failed:", error);
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="p-8 text-red-500">
+        Error loading cashiers: {error.message}
+      </div>
+    );
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!cashierToDelete) return;
+
+    try {
+      await deleteCashier(cashierToDelete.id);
+      toast({
+        title: "Success",
+        description: "Cashier deleted successfully!",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete cashier!",
+      });
+    } finally {
+      setCashierToDelete(null);
+    }
+  };
+
+  // Add actions column if user has permissions
+  const actionColumn: ColumnDef<Cashier> = {
+    id: "actions",
+    cell: ({ row }) => (
+      <TableActions
+        onView={() => router.push(`/cashiers/${row.original.id}`)}
+        onEdit={() => {
+          setCurrentCashier(row.original);
+          setIsModalOpen(true);
+        }}
+        onDelete={() => setCashierToDelete(row.original)}
+        canEdit={userRole === "ADMIN" || userRole === "MANAGER"}
+        canDelete={userRole === "ADMIN"}
+      />
+    ),
+  };
+
+  const enhancedColumns: ColumnDef<Cashier>[] = [
+    ...cashierColumns,
+    ...(userRole !== "CASHIER" && userRole !== "USER" ? [actionColumn] : []),
+  ];
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-8 space-y-6">
+      <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Cashiers</h1>
-        <Button onClick={() => setAddModalOpen(true)}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add Cashier
-        </Button>
+        {(userRole === "ADMIN" || userRole === "MANAGER") && (
+          <Button
+            onClick={() => {
+              setCurrentCashier(null);
+              setIsModalOpen(true);
+            }}
+            disabled={isCashiersLoading}
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add Cashier
+          </Button>
+        )}
       </div>
 
       <DataTable
-        data={cashiers || []}
-        columns={cashierColumns}
+        data={(cashiers as Cashier[]) || []}
+        columns={enhancedColumns}
         emptyMessage="No cashiers found."
+        isLoading={isCashiersLoading}
       />
 
-      <AddCashierModal
-        open={isAddModalOpen}
-        onClose={() => setAddModalOpen(false)}
+      <CashierFormModal
+        open={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setCurrentCashier(null);
+        }}
+        onSubmit={handleSubmit}
+        cashier={currentCashier}
+      />
+
+      <ConfirmDeleteDialog
+        open={!!cashierToDelete}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setCashierToDelete(null)}
+        title={`Delete ${cashierToDelete?.name}?`}
+        description="This will permanently remove this cashier and their data."
       />
     </div>
   );

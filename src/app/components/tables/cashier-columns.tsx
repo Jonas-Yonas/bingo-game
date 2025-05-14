@@ -1,130 +1,140 @@
-// import { ColumnDef } from "@tanstack/react-table";
-// import { Badge } from "@/components/ui/badge";
-// import { Cashier } from "@/types";
-// import { Button } from "@/components/ui/button";
-
-// export const cashierColumns: ColumnDef<Cashier>[] = [
-//   {
-//     accessorKey: "name", // Directly accessing the "name" field
-//     header: "Name",
-//   },
-//   {
-//     accessorKey: "email", // Directly accessing the "email" field
-//     header: "Email",
-//   },
-//   {
-//     accessorKey: "phone", // Directly accessing the "phone" field
-//     header: "Phone",
-//   },
-//   {
-//     accessorKey: "status", // Directly accessing the "status" field
-//     header: "Status",
-//     cell: ({ row }) => {
-//       const status = row.original.status; // Get the cashier status
-//       let badgeVariant:
-//         | "default"
-//         | "secondary"
-//         | "destructive"
-//         | "outline"
-//         | null = null;
-
-//       // Map the status to badge variant
-//       if (status === "AVAILABLE") {
-//         badgeVariant = "default";
-//       } else if (status === "ON_BREAK") {
-//         badgeVariant = "secondary"; // You can replace "secondary" with another variant if needed
-//       } else if (status === "OFF_DUTY") {
-//         badgeVariant = "destructive";
-//       }
-
-//       return (
-//         <Badge
-//           variant={badgeVariant} // Use the mapped variant
-//           className="dark:bg-opacity-20 dark:text-opacity-90"
-//         >
-//           {status}
-//         </Badge>
-//       );
-//     },
-//   },
-//   {
-//     accessorKey: "createdAt", // Directly accessing the "createdAt" field
-//     header: "Created At",
-//     cell: ({ row }) => {
-//       const createdAt = row.original.createdAt;
-//       const date = new Date(createdAt);
-//       return date.toLocaleString(); // Formatting the date
-//     },
-//   },
-//   {
-//     id: "action", // Action column for admin to block/unblock the cashier
-//     header: "Action",
-//     cell: ({ row }) => {
-//       const isActive = row.original.status === "AVAILABLE"; // Check if cashier is available
-//       return (
-//         <Button
-//           onClick={() =>
-//             alert(`${isActive ? "Block" : "Unblock"} ${row.original.name}`)
-//           }
-//           className={`h-7 px-2.5 text-xs leading-none rounded-sm ${
-//             !isActive ? "bg-red-400" : "bg-green-600"
-//           }`}
-//         >
-//           {isActive ? "Block" : "Unblock"}
-//         </Button>
-//       );
-//     },
-//   },
-// ];
-
-// app/admin/cashiers/columns.ts
 import { ColumnDef } from "@tanstack/react-table";
-import { Cashier } from "@prisma/client";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Cashier } from "@/types";
+import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const cashierColumns: ColumnDef<Cashier>[] = [
   {
     accessorKey: "name",
-    header: "Name",
+    header: "Cashier Name",
+    cell: ({ row }) => (
+      <div className="max-w-[180px]">
+        <div className="font-medium truncate">{row.original.name}</div>
+        <div className="text-xs text-muted-foreground truncate">
+          {row.original.email}
+        </div>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "phone",
+    header: "Contact",
+    cell: ({ row }) => (
+      <div className="max-w-[150px]">
+        <div className="text-sm truncate">
+          {row.original.phone || "Not Provided"}
+        </div>
+      </div>
+    ),
   },
   {
     accessorKey: "email",
     header: "Email",
-  },
-  {
-    accessorKey: "phone",
-    header: "Phone",
+    cell: ({ row }) => (
+      <div className="max-w-[150px]">
+        <div className="text-sm truncate">
+          {row.original.email || "Not Provided"}
+        </div>
+      </div>
+    ),
   },
   {
     accessorKey: "status",
     header: "Status",
+    cell: ({ row }) => {
+      // Map statuses to your available variants
+      const statusVariantMap = {
+        AVAILABLE: "default", // Using 'default' for available
+        ON_BREAK: "outline", // Using 'outline' for on break
+        OFF_DUTY: "destructive", // Using 'destructive' for off duty
+      } as const;
+
+      return (
+        <div className="flex items-center gap-2 max-w-[180px]">
+          {/* Status Badge */}
+          <Badge
+            variant={
+              statusVariantMap[
+                row.original.status as keyof typeof statusVariantMap
+              ] || "secondary"
+            }
+            className={`capitalize ${
+              row.original.status === "AVAILABLE"
+                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                : row.original.status === "ON_BREAK"
+                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                : ""
+            }`}
+          >
+            {row.original.status.toLowerCase().replace("_", " ")}
+          </Badge>
+
+          {/* Active/Inactive Indicator */}
+          <div className="flex items-center gap-1">
+            <span
+              className={`w-2 h-2 rounded-full ${
+                row.original.isActive ? "bg-green-500" : "bg-red-500"
+              }`}
+            />
+            <span className="text-xs text-muted-foreground">
+              {row.original.isActive ? "Active" : "Inactive"}
+            </span>
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "shop",
+    header: "Assigned Shop",
+    cell: ({ row }) => {
+      const shop = row.original.shop;
+      return (
+        <div className="max-w-[180px]">
+          <div className="text-sm truncate">{shop?.name || "Unassigned"}</div>
+          {shop?.location && (
+            <div className="text-xs text-muted-foreground truncate">
+              {shop.location.split(",")[0]?.trim()}
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Joined On",
     cell: ({ row }) => (
-      <span
-        className={`px-2 py-1 rounded-full text-xs ${
-          row.original.isActive
-            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-        }`}
-      >
-        {row.original.isActive ? "Active" : "Inactive"}
-      </span>
+      <div className="max-w-[120px]">
+        <div className="text-sm">
+          {new Date(row.original.createdAt!).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })}
+        </div>
+      </div>
     ),
   },
   {
-    id: "actions",
-    cell: ({ row }) => (
-      <div className="flex space-x-2">
-        <Button variant="outline" size="sm" asChild>
-          <Link href={`/admin/cashiers/${row.original.id}/edit`}>
-            <Pencil className="h-4 w-4" />
-          </Link>
-        </Button>
-        <Button variant="destructive" size="sm">
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </div>
-    ),
+    accessorKey: "id",
+    header: "Cashier ID",
+    cell: ({ row }) => {
+      const id = row.original.id;
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="max-w-[120px] truncate cursor-pointer">{id}</div>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-[300px] break-words">
+            {id}
+          </TooltipContent>
+        </Tooltip>
+      );
+    },
   },
 ];

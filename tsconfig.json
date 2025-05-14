@@ -13,7 +13,7 @@
     "jsx": "preserve",
     "incremental": true,
     "types": ["node"],
-    "moduleResolution": "bundler", // node
+    "moduleResolution": "node", // bundler
     "plugins": [
       {
         "name": "next"

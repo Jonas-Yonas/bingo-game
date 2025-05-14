@@ -4,12 +4,15 @@ import { getServerSession } from "next-auth";
 import { ShopFormSchema } from "@/lib/validations/shopSchema";
 import { authOptions } from "@/lib/authOptions";
 
-/** Correct GET route handler */
-export async function GET(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const { id: shopId } = context.params;
+// Define your own inferred type to match App Router's expectations
+type RouteContext = {
+  params: {
+    id: string;
+  };
+};
+
+export async function GET(request: NextRequest, { params }: RouteContext) {
+  const shopId = params.id;
 
   try {
     const shop = await db.shop.findUnique({
@@ -71,11 +74,8 @@ export async function GET(
 }
 
 /** Route to EDIT a shop */
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id: shopId } = params;
+export async function PATCH(request: NextRequest, context: RouteContext) {
+  const { id: shopId } = context.params;
 
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
@@ -108,11 +108,8 @@ export async function PATCH(
 }
 
 /** Route to DELETE a shop */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id: shopId } = params;
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  const { id: shopId } = context.params;
 
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
