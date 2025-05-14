@@ -27,7 +27,7 @@ export async function GET() {
     });
 
     return NextResponse.json(cashiers);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch cashiers" },
       { status: 500 }

@@ -66,7 +66,7 @@ export default function ShopsPage() {
     try {
       await deleteShop(shopToDelete.id);
       toast.success("Shop deleted successfully!");
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete shop!");
     } finally {
       setShopToDelete(null); // Close the dialog

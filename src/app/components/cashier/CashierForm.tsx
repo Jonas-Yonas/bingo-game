@@ -31,7 +31,6 @@ export function CashierForm({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    control,
     setValue,
     watch,
   } = useForm<CashierFormValues>({
