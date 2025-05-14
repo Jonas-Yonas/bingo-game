@@ -13,6 +13,8 @@ export function PublicTopbar() {
   useEffect(() => setMounted(true), []);
 
   const toggleTheme = () => {
+    return null; // This line will be removed when request comes up
+
     if (!mounted) return;
     setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
