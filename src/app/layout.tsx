@@ -39,13 +39,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} ${robotoMono.variable} font-sans`}>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${inter.variable} ${robotoMono.variable} font-sans dark:bg-[#020817] dark:text-gray-100`}
+      >
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          enableSystem={false}
           disableTransitionOnChange
+          storageKey="myapp-theme" // Unique key for the app
         >
           <AuthProvider>
             <ReactQueryProvider>
