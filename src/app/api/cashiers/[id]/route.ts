@@ -5,11 +5,13 @@ import { CashierFormSchema } from "@/lib/validations/cashierSchema";
 import { authOptions } from "@/lib/authOptions";
 
 // GET /api/cashiers/[id]
-export async function GET(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
-  const cashierId = context.params.id;
+// export async function GET(
+//   request: NextRequest,
+//   context: { params: { id: string } }
+// ) {
+export async function GET() {
+  // const cashierId = context.params.id;
+  const cashierId = "78787777878787";
 
   try {
     const cashier = await db.cashier.findUnique({
