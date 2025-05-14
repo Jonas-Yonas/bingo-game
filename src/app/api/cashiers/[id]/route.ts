@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { CashierFormSchema } from "@/lib/validations/cashierSchema";
@@ -6,7 +6,7 @@ import { authOptions } from "@/lib/authOptions";
 
 /** Route to GET single cashier with details */
 export async function GET(
-  request: NextRequest,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   const cashierId = params.id;
@@ -56,7 +56,7 @@ export async function GET(
 
 /** Route to UPDATE a cashier */
 export async function PATCH(
-  request: NextRequest,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   const cashierId = params.id;
@@ -109,7 +109,7 @@ export async function PATCH(
 
 /** Route to DELETE a cashier */
 export async function DELETE(
-  request: NextRequest,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   const cashierId = params.id;
