@@ -4,12 +4,12 @@ import { getServerSession } from "next-auth";
 import { CashierFormSchema } from "@/lib/validations/cashierSchema";
 import { authOptions } from "@/lib/authOptions";
 
-/** Route to GET single cashier with details */
+// GET /api/cashiers/[id]
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
-  const cashierId = params.id;
+  const cashierId = context.params.id;
 
   try {
     const cashier = await db.cashier.findUnique({
@@ -54,12 +54,12 @@ export async function GET(
   }
 }
 
-/** Route to UPDATE a cashier */
+// PATCH /api/cashiers/[id]
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
-  const cashierId = params.id;
+  const cashierId = context.params.id;
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -69,13 +69,6 @@ export async function PATCH(
   try {
     const body = await request.json();
     const data = CashierFormSchema.parse(body);
-
-    if (!data.name || !data.email) {
-      return NextResponse.json(
-        { error: "Name and email are required" },
-        { status: 400 }
-      );
-    }
 
     const updatedCashier = await db.cashier.update({
       where: { id: cashierId },
@@ -107,12 +100,12 @@ export async function PATCH(
   }
 }
 
-/** Route to DELETE a cashier */
+// DELETE /api/cashiers/[id]
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
-  const cashierId = params.id;
+  const cashierId = context.params.id;
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
