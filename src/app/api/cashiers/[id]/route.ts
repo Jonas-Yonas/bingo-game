@@ -1,14 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { db } from "@/lib/db";
+
 import { getServerSession } from "next-auth";
 import { CashierFormSchema } from "@/lib/validations/cashierSchema";
 import { authOptions } from "@/lib/authOptions";
 
 // GET /api/cashiers/[id]
-export async function GET(
+export const GET: (
   request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+  context: { params: { id: string } }
+) => Promise<NextResponse> = async (request, { params }) => {
   try {
     const cashier = await db.cashier.findUnique({
       where: { id: params.id },
@@ -48,7 +50,7 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+};
 
 // PATCH /api/cashiers/[id]
 export async function PATCH(

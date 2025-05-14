@@ -8,13 +8,15 @@ import Link from "next/link";
 export default function Dashboard() {
   const { data: session, status } = useSession();
 
+  console.log(session);
+
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <p className="mt-4 text-gray-600">Loading dashboard...</p>
 
-          <Spinner size="lg" />
+          <Spinner />
 
           {/* <Button disabled>
   <Spinner size="sm" className="mr-2" />
