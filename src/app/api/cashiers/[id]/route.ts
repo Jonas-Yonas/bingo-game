@@ -4,14 +4,11 @@ import { getServerSession } from "next-auth";
 import { CashierFormSchema } from "@/lib/validations/cashierSchema";
 import { authOptions } from "@/lib/authOptions";
 
-type RouteContext = {
-  params: {
-    id: string;
-  };
-};
-
 /** Route to GET single cashier with details */
-export async function GET(request: NextRequest, { params }: RouteContext) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const cashierId = params.id;
 
   try {
@@ -58,8 +55,11 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
 }
 
 /** Route to UPDATE a cashier */
-export async function PATCH(request: NextRequest, context: RouteContext) {
-  const { id: cashierId } = context.params;
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const cashierId = params.id;
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -70,7 +70,6 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const body = await request.json();
     const data = CashierFormSchema.parse(body);
 
-    // Additional validation
     if (!data.name || !data.email) {
       return NextResponse.json(
         { error: "Name and email are required" },
@@ -109,8 +108,11 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 }
 
 /** Route to DELETE a cashier */
-export async function DELETE(request: NextRequest, context: RouteContext) {
-  const { id: cashierId } = context.params;
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const cashierId = params.id;
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -118,7 +120,6 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
   }
 
   try {
-    // Check if cashier exists
     const cashier = await db.cashier.findUnique({
       where: { id: cashierId },
     });
@@ -127,7 +128,6 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: "Cashier not found" }, { status: 404 });
     }
 
-    // Check if cashier is linked to a user account
     if (cashier.userId) {
       return NextResponse.json(
         {
