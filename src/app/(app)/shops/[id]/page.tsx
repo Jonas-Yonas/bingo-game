@@ -21,7 +21,7 @@ import { useState } from "react";
 import { ShopFormModal } from "@/app/components/shop/AddShopModal";
 import { ShopFormValues } from "@/lib/validations/shopSchema";
 import { useDeleteShop, useUpdateShop } from "@/hooks/useShops";
-import { Shop } from "@/types";
+import { Cashier, Shop } from "@/types";
 import { ConfirmDeleteDialog } from "@/app/components/ConfirmDeleteDialog";
 
 export default function ShopDetailsPage() {
@@ -65,7 +65,7 @@ export default function ShopDetailsPage() {
         });
       }
       setIsModalOpen(false);
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Unable to save your changes.",
@@ -276,7 +276,7 @@ export default function ShopDetailsPage() {
           <CardContent>
             {shop.cashiers.length > 0 ? (
               <div className="space-y-4">
-                {shop.cashiers.map((cashier: any) => (
+                {shop.cashiers.map((cashier: Cashier) => (
                   <div
                     key={cashier.id}
                     className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"

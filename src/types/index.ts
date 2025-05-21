@@ -22,6 +22,7 @@ export interface Cashier {
   phone?: string;
   isActive?: boolean;
   status: "AVAILABLE" | "ON_BREAK" | "OFF_DUTY";
+  avatar?: string;
   // shop?: {
   //   id: string;
   //   name: string;
@@ -39,4 +40,14 @@ export type Transaction = {
   type: "TOP UP" | "DEBIT";
   description: string;
   createdAt: Date | string;
+};
+
+export type WalletTransaction = {
+  id: string;
+  amount: number;
+  type: "CREDIT" | "DEBIT";
+  method: "bank_transfer" | "cash" | "online_payment";
+  reference: string;
+  createdAt: Date | string;
+  processedBy?: Pick<User, "name" | "email"> | null;
 };
