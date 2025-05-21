@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
   output   = "../node_modules/.prisma/client"
@@ -10,19 +9,21 @@ datasource db {
 }
 
 model User {
-  id             String     @id @default(auto()) @map("_id") @db.ObjectId
-  name           String?
-  email          String     @unique
-  emailVerified  DateTime?
-  password       String?
-  image          String?
-  role           String     @default("USER")
-  accounts       Account[]
-  sessions       Session[]
-  managedShop    Shop[]     @relation("ShopOwner")
-  cashierProfile Cashier?   @relation("CashierProfile")
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  id                    String              @id @default(auto()) @map("_id") @db.ObjectId
+  name                  String?
+  email                 String              @unique
+  emailVerified         DateTime?
+  password              String?
+  image                 String?
+  role                  String              @default("USER")
+  accounts              Account[]
+  sessions              Session[]
+  managedShop           Shop[]              @relation("ShopOwner")
+  createdCashiers       Cashier[]           @relation("CashierCreator") // New field (one-to-many)
+  cashierProfile        Cashier?            @relation("CashierProfile") // Still keep this if you want to assign one user as cashier
+  processedTransactions WalletTransaction[] @relation("UserProcessedTransactions")
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
 }
 
 model Account {
@@ -52,30 +53,53 @@ model Session {
 }
 
 model Cashier {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  email     String   @unique
-  phone     String?
-  isActive  Boolean  @default(true)
-  status    String   @default("AVAILABLE")
-  user      User?    @relation("CashierProfile", fields: [userId], references: [id])
-  userId    String?  @db.ObjectId @unique
-  shop      Shop     @relation("ShopCashiers", fields: [shopId], references: [id], onDelete: Cascade)
-  shopId    String   @db.ObjectId
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  email    String  @unique
+  phone    String?
+  isActive Boolean @default(true)
+  status   String  @default("AVAILABLE")
+
+  // This is the user assigned to be the cashier (optional one-to-one)
+  userId String? @unique @db.ObjectId
+  user   User?   @relation("CashierProfile", fields: [userId], references: [id])
+
+  // This is the user who created this cashier (many-to-one)
+  createdBy String? @db.ObjectId
+  creator   User?   @relation("CashierCreator", fields: [createdBy], references: [id])
+
+  shopId String @db.ObjectId
+  shop   Shop   @relation("ShopCashiers", fields: [shopId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Shop {
-  id               String    @id @default(auto()) @map("_id") @db.ObjectId
-  name             String
-  location         String
-  shopCommission   Float     @default(0.0)
-  systemCommission Float     @default(0.0)
-  walletBalance    Float     @default(0.0)
-  cashiers         Cashier[] @relation("ShopCashiers")
-  manager          User?     @relation("ShopOwner", fields: [managerId], references: [id])
-  managerId        String?   @db.ObjectId
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                 String              @id @default(auto()) @map("_id") @db.ObjectId
+  name               String
+  location           String
+  shopCommission     Float               @default(0.0)
+  systemCommission   Float               @default(0.0)
+  walletBalance      Float               @default(0.0)
+  cashiers           Cashier[]           @relation("ShopCashiers")
+  manager            User                @relation("ShopOwner", fields: [managerId], references: [id])
+  managerId          String              @db.ObjectId
+  walletTransactions WalletTransaction[] @relation("ShopTransactions")
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+}
+
+model WalletTransaction {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  amount        Float
+  type          String // CREDIT or DEBIT
+  method        String // bank_transfer, cash, online_payment
+  reference     String
+  shop          Shop     @relation("ShopTransactions", fields: [shopId], references: [id])
+  shopId        String   @db.ObjectId
+  processedBy   User?    @relation("UserProcessedTransactions", fields: [processedById], references: [id])
+  processedById String?  @db.ObjectId
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

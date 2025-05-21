@@ -22,6 +22,7 @@ const TOAST_REMOVE_DELAY = 1000;
 
 type ToastType = Omit<ToasterToast, "id">;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
   UPDATE_TOAST: "UPDATE_TOAST",

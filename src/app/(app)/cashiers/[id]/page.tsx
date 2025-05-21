@@ -2,13 +2,7 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -63,7 +57,7 @@ export default function CashierDetailsPage() {
         });
       }
       setIsModalOpen(false);
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to update cashier",
@@ -87,7 +81,7 @@ export default function CashierDetailsPage() {
         description: "Cashier deleted successfully",
       });
       router.push("/cashiers");
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to delete cashier",
