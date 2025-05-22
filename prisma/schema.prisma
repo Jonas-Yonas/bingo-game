@@ -96,6 +96,7 @@ model WalletTransaction {
   type          String // CREDIT or DEBIT
   method        String // bank_transfer, cash, online_payment
   reference     String
+  status        String @default("completed") // completed, pending, failed
   shop          Shop     @relation("ShopTransactions", fields: [shopId], references: [id])
   shopId        String   @db.ObjectId
   processedBy   User?    @relation("UserProcessedTransactions", fields: [processedById], references: [id])

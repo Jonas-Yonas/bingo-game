@@ -44,11 +44,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // 2. Check if user has permission to create shops (e.g., super admin)
+  // 2. Check if user has permission to create shops
   // You might want to add role-based access control
-  // if (session.user.role !== 'SUPER_ADMIN') {
-  //   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  // }
+  if (session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   try {
     const json = await req.json();

@@ -11,9 +11,8 @@ type RouteContext = {
   };
 };
 
-export async function GET(request: NextRequest, { params }: RouteContext) {
-  const shopId = params.shopId;
-
+export async function GET(request: NextRequest, context: RouteContext) {
+  const { shopId } = context.params;
   try {
     const shop = await db.shop.findUnique({
       where: { id: shopId },
@@ -78,7 +77,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   const { shopId } = context.params;
 
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  if (!session?.user?.id && session?.user.role !== "ADMIN") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

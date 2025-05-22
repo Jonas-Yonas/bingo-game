@@ -23,6 +23,9 @@ import { ShopFormValues } from "@/lib/validations/shopSchema";
 import { useDeleteShop, useUpdateShop } from "@/hooks/useShops";
 import { Cashier, Shop } from "@/types";
 import { ConfirmDeleteDialog } from "@/app/components/ConfirmDeleteDialog";
+import { TopUpModal } from "@/app/components/wallet/TopupModal";
+import { useTopUpShop } from "@/hooks/useTopup";
+import { TopUpFormValues } from "@/lib/validations/topupSchema";
 
 export default function ShopDetailsPage() {
   const { id } = useParams();
@@ -31,9 +34,12 @@ export default function ShopDetailsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentShop, setCurrentShop] = useState<Shop | null>(null);
   const [shopToDelete, setShopToDelete] = useState<Shop | null>(null);
+  const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
 
   const { mutateAsync: updateShop } = useUpdateShop();
   const { mutateAsync: deleteShop } = useDeleteShop();
+  const { mutateAsync: topUpShop, isPending: isToppingUp } = useTopUpShop();
+
   const queryClient = useQueryClient();
 
   const {
@@ -111,6 +117,21 @@ export default function ShopDetailsPage() {
     }
   };
 
+  const handleTopUp = async (values: TopUpFormValues) => {
+    try {
+      await topUpShop({
+        shopId: id as string,
+        amount: values.amount,
+        method: values.method,
+        reference: values.reference,
+      });
+      setIsTopUpModalOpen(false);
+    } catch (error) {
+      // Error handling is already done in the hook
+      console.log(error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col gap-y-3 items-center justify-center h-64">
@@ -169,7 +190,7 @@ export default function ShopDetailsPage() {
                   variant="destructive"
                   size="sm"
                   onClick={handleDeleteClick}
-                  disabled={!shop} // Disable if no shop loaded
+                  disabled={!shop}
                 >
                   <Icons.trash className="h-4 w-4 mr-2" />
                   Delete
@@ -207,6 +228,15 @@ export default function ShopDetailsPage() {
                     maximumFractionDigits: 2,
                   })}
                 </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2 w-full"
+                  onClick={() => setIsTopUpModalOpen(true)}
+                >
+                  <Icons.plus className="h-4 w-4 mr-2" />
+                  Top Up
+                </Button>
               </div>
             </div>
           </CardContent>
@@ -336,6 +366,13 @@ export default function ShopDetailsPage() {
           )}
         </Card>
       </div>
+
+      <TopUpModal
+        open={isTopUpModalOpen}
+        onClose={() => setIsTopUpModalOpen(false)}
+        onSubmit={handleTopUp}
+        isLoading={isToppingUp}
+      />
 
       <ShopFormModal
         open={isModalOpen}
