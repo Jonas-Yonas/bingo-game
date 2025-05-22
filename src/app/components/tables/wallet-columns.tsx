@@ -66,7 +66,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => (
+    cell: ({}) => (
       <Button variant="ghost" size="sm">
         <MoreHorizontal className="h-4 w-4" />
       </Button>

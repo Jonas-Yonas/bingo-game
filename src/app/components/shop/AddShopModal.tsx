@@ -10,6 +10,8 @@ import {
 import { ShopForm } from "./ShopForm";
 import type { Shop } from "@/types";
 import type { ShopFormValues } from "@/lib/validations/shopSchema";
+import { useManagers } from "@/hooks/useManagers";
+import { Spinner } from "@/components/ui/spinner";
 
 type ShopFormModalProps = {
   open: boolean;
@@ -24,7 +26,23 @@ export function ShopFormModal({
   onSubmit,
   shop,
 }: ShopFormModalProps) {
+  const { managers, isLoading, error } = useManagers();
+
   if (!open) return null;
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center p-8">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 text-red-500">Error loading managers: {error}</div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -36,11 +54,39 @@ export function ShopFormModal({
                 {shop ? "Edit " : "Add New"} Shop
               </DialogTitle>
             </DialogHeader>
-            <ShopForm
+            {/* <ShopForm
               mode={shop ? "edit" : "add"}
               defaultValues={shop || undefined}
               onSubmit={async (data) => onSubmit(data)}
               onCancel={onClose}
+            /> */}
+
+            {/* <ShopForm
+              mode={shop ? "edit" : "add"}
+              defaultValues={
+                shop
+                  ? {
+                      ...shop,
+                      managerId: shop.managerId ?? undefined, // convert null to undefined
+                    }
+                  : undefined
+              }
+              onSubmit={async (data) => onSubmit(data)}
+              onCancel={onClose}
+            /> */}
+            <ShopForm
+              mode={shop ? "edit" : "add"}
+              defaultValues={
+                shop
+                  ? {
+                      ...shop,
+                      managerId: shop.managerId ?? undefined, // Convert null to undefined
+                    }
+                  : undefined
+              }
+              onSubmit={async (data) => onSubmit(data)}
+              onCancel={onClose}
+              managers={managers || []}
             />
           </DialogContent>
         </Dialog>

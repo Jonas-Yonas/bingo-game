@@ -74,7 +74,7 @@ export async function POST(req: Request) {
         isActive: data.isActive,
         status: data.status,
         shopId: data.shopId,
-        userId: session.user.id, // Link to creating user if needed
+        createdBy: session.user.id, // Link to creating user if needed
       },
       include: {
         shop: {

@@ -12,6 +12,7 @@ export const ShopFormSchema = z.object({
     .min(0, "Commission cannot be negative")
     .max(100, "Commission cannot exceed 100%"),
   walletBalance: z.coerce.number().min(0, "Balance cannot be negative"),
+  managerId: z.string().min(1, "Manager is required"),
 });
 
 export type ShopFormValues = z.infer<typeof ShopFormSchema>;

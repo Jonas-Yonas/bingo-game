@@ -7,13 +7,12 @@ import { authOptions } from "@/lib/authOptions";
 // Define your own inferred type to match App Router's expectations
 type RouteContext = {
   params: {
-    id: string;
+    shopId: string;
   };
 };
 
-export async function GET(request: NextRequest, { params }: RouteContext) {
-  const shopId = params.id;
-
+export async function GET(request: NextRequest, context: RouteContext) {
+  const { shopId } = context.params;
   try {
     const shop = await db.shop.findUnique({
       where: { id: shopId },
@@ -75,10 +74,10 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
 
 /** Route to EDIT a shop */
 export async function PATCH(request: NextRequest, context: RouteContext) {
-  const { id: shopId } = context.params;
+  const { shopId } = context.params;
 
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  if (!session?.user?.id && session?.user.role !== "ADMIN") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -109,7 +108,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
 /** Route to DELETE a shop */
 export async function DELETE(request: NextRequest, context: RouteContext) {
-  const { id: shopId } = context.params;
+  const { shopId } = context.params;
 
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
